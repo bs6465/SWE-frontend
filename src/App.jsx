@@ -147,14 +147,7 @@ function App() {
 
   // --- StatusModal 핸들러 ---
   const handleOpenStatusModal = () => {
-    // 👇 [중요] 이 로그를 추가하세요.
-    console.log('--- Status Card Clicked ---');
-
-    setModalState((prev) => {
-      // 👇 [중요] 이 로그를 추가하여 State가 true로 바뀌는지 확인하세요.
-      console.log('Status Modal State set to TRUE');
-      return { ...prev, status: true };
-    });
+    setModalState((prev) => ({ ...prev, status: true }));
   };
 
   // --- TimezoneModal 핸들러 ---
@@ -164,21 +157,21 @@ function App() {
 
   // --- [추가] ProjectModal 핸들러 ---
   const handleOpenProjectModal = (eventData) => {
-    setModalState({ ...modalState, project: eventData });
+    setModalState((prev) => ({ ...prev, project: eventData }));
   };
 
   // (일정 생성 모달 핸들러)
   const handleOpenCreateScheduleModal = () => {
-    setModalState({ ...modalState, createSchedule: true });
+    setModalState((prev) => ({ ...prev, createSchedule: true }));
   };
 
   // --- 공통 모달 닫기 핸들러 ---
   const handleCloseModal = () => {
-    setModalState({
+    setModalState((prev) => ({
       status: false,
       project: null,
       createSchedule: false,
-    });
+    }));
   };
 
   return (
