@@ -18,7 +18,7 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers }) {
 
         {/* 3. [수정] 하드코딩된 텍스트 대신, 실제 목록을 map으로 렌더링 */}
         <div className="space-y-3 max-h-60 overflow-y-auto">
-          {teamMembers.length > 0 ? (
+          {teamMembers?.length > 0 ? (
             teamMembers.map((member) => {
               // 4. [신규] 이 멤버가 onlineUserSet에 있는지 확인
               const isOnline = onlineUserSet.has(member.user_id);

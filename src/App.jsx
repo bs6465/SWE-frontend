@@ -182,7 +182,7 @@ function App() {
         onStatusClick={handleOpenStatusModal}
         onTimezoneClick={() => alert('Timezone 모달 미구현')}
         onlineCount={onlineUsers.size} // 👈 .length에서 .size로 수정
-        totalCount={teamMembers.length}
+        totalCount={teamMembers?.length || 0}
       />
 
       <Calendar
