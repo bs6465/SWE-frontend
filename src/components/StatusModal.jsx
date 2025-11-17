@@ -48,6 +48,13 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers }) {
         </div>
 
         <button
+          onClick={onAddMemberClick} // 👈 App.jsx의 핸들러 호출
+          className="mt-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 w-full"
+        >
+          + 새 팀원 추가
+        </button>
+        
+        <button
           onClick={onClose}
           className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
         >

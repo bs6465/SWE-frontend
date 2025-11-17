@@ -3,9 +3,6 @@
 // 1. { io } import 제거!
 import React, { useState, useEffect, useRef } from 'react';
 
-// 2. [제거] const socket = io(...) 줄 삭제!
-
-// 3. [수정] props로 'socket' 받기
 function Chat({ currentUser, socket }) {
   const [messages, setMessages] = useState([]);
   // const [isConnected, setIsConnected] = useState(false); // 👈 App.jsx가 관리
@@ -47,21 +44,81 @@ function Chat({ currentUser, socket }) {
     setNewMessage('');
   };
 
-  return (
-    <section /* ... */>
-      {/* ... */}
-      {/* 9. [제거] isConnected 상태 제거 (하드코딩된 로딩 텍스트) */}
-      <div id="chatStatus" className="text-center text-gray-500 mt-20" style={{ display: 'block' }}>
-        채팅 내역 없음 (실시간 채팅만 지원)
+  // UI를 위한 헬퍼 함수 (메시지 렌더링)
+  const renderMessageBubble = (messageData) => {
+    // 'chatHandler.js'에 따라 데이터 형식을 맞춥니다.
+    // { from: userId, text: msg, timestamp: Date() }
+    const { from, text, timestamp } = messageData;
+    const isMe = from === currentUser?.user_id; // 현재 로그인한 유저 ID와 비교
+
+    const alignment = isMe ? 'justify-end' : 'justify-start';
+    const bubbleColor = isMe ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800';
+    const name = isMe ? '나' : from; // 실제로는 username으로 대체해야 합니다.
+    const time = new Date(timestamp).toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return (
+      <div key={Math.random()} className={`flex ${alignment} w-full`}>
+        <div className="max-w-[80%] mb-3">
+          <p className={`text-xs mb-1 ${isMe ? 'text-right' : 'text-left'} text-gray-600`}>
+            {name} <span className="ml-2 text-gray-400">{time}</span>
+          </p>
+          <div className={`px-3 py-2 rounded-xl shadow-sm ${bubbleColor} inline-block break-words`}>
+            {text}
+          </div>
+        </div>
       </div>
-      {/* ... */}
-      <button
-        onClick={sendMessage}
-        disabled={!socket || !socket.connected} // 👈 소켓 연결 상태로 disabled
-      >
-        전송
-      </button>
-      {/* ... */}
+    );
+  };
+
+  return (
+    <section className="mb-8">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">채팅</h2>
+      <div className="bg-white p-4 rounded-xl shadow-xl border border-indigo-100">
+        {/* 1. Message Display Area */}
+        <div
+          id="chatMessages"
+          className="h-64 w-full mb-4 max-h-[400px] overflow-y-auto flex flex-col pr-3"
+        >
+          {/* [Placeholder] */}
+          <div
+            id="chatStatus"
+            className="text-center text-gray-500 mt-20"
+            style={{ display: 'block' }}
+          >
+            채팅 내역 없음 (실시간 채팅만 지원)
+          </div>
+
+          {/* 2. 메시지 목록 렌더링 */}
+          {messages.map((msg, index) => renderMessageBubble(msg))}
+
+          {/* (스크롤 앵커 - 스크롤 로직은 이전 코드와 유사하게 구현되어 있어야 함) */}
+          <div ref={chatMessagesEndRef} />
+        </div>
+
+        {/* 3. Message Input Form */}
+        <div className="flex space-x-3">
+          <input
+            type="text"
+            placeholder="메시지를 입력하고 Enter를 누르세요..."
+            className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') sendMessage();
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 disabled:bg-indigo-300"
+            disabled={!socket || !socket.connected || !currentUser}
+          >
+            전송
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

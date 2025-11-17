@@ -8,6 +8,7 @@ import StatusModal from './components/StatusModal';
 import Calendar from './components/Calendar'; // Calendar import
 import ProjectModal from './components/ProjectModal'; // ProjectModal import
 import CreateScheduleModal from './components/CreateScheduleModal';
+import AddMemberModal from './components/AddMemberModal';
 import { useNavigate } from 'react-router-dom'; // 401 에러 시 로그아웃 처리용
 
 // 2. [신규] 소켓 인스턴스 생성
@@ -31,7 +32,8 @@ function App() {
   const [modalState, setModalState] = useState({
     status: false,
     project: null, // (ProjectModal용)
-    createSchedule: false, // 👈 3. '일정 생성' 모달 상태
+    createSchedule: false, // '일정 생성' 모달 상태
+    addMember: false,
   });
 
   const navigate = useNavigate();
@@ -165,12 +167,18 @@ function App() {
     setModalState((prev) => ({ ...prev, createSchedule: true }));
   };
 
+  // 팀원 추가 모달 핸들러
+  const handleOpenAddMemberModal = () => {
+    setModalState((prev) => ({ ...prev, status: false, addMember: true }));
+  };
+
   // --- 공통 모달 닫기 핸들러 ---
   const handleCloseModal = () => {
     setModalState((prev) => ({
       status: false,
       project: null,
       createSchedule: false,
+      addMember: false,
     }));
   };
 
@@ -200,7 +208,15 @@ function App() {
       <StatusModal
         isOpen={modalState.status}
         onClose={handleCloseModal}
-        // ...
+        teamMembers={teamMembers}
+        onlineUsers={onlineUsers}
+        onAddMemberClick={handleOpenAddMemberModal}
+      />
+
+      <AddMemberModal
+        isOpen={modalState.addMember}
+        onClose={handleCloseModal}
+        currentUser={currentUser}
       />
 
       <ProjectModal
