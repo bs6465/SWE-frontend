@@ -147,7 +147,14 @@ function App() {
 
   // --- StatusModal 핸들러 ---
   const handleOpenStatusModal = () => {
-    setOpenModal({ ...modalState, status: true });
+    // 👇 [중요] 이 로그를 추가하세요.
+    console.log('--- Status Card Clicked ---');
+
+    setModalState((prev) => {
+      // 👇 [중요] 이 로그를 추가하여 State가 true로 바뀌는지 확인하세요.
+      console.log('Status Modal State set to TRUE');
+      return { ...prev, status: true };
+    });
   };
 
   // --- TimezoneModal 핸들러 ---
