@@ -203,6 +203,7 @@ function App() {
       <Chat
         currentUser={currentUser}
         socket={socket} // 👈 채팅용
+        teamMembers={teamMembers}
       />
 
       <StatusModal

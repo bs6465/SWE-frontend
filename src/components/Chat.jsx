@@ -31,6 +31,15 @@ function Chat({ currentUser, socket }) {
     // 8. [수정] 의존성 배열에 socket 추가
   }, [currentUserId, socket]);
 
+  // teamMembers 목록이 바뀔 때만 다시 계산 (성능 최적화)
+  const userMap = useMemo(() => {
+    const map = new Map();
+    teamMembers.forEach((member) => {
+      map.set(member.user_id, member.username); // user_id를 key로, username을 value로
+    });
+    return map;
+  }, [teamMembers]);
+
   // [수정] 보낼 때도 'sendTeamMessage' 사용
   const sendMessage = () => {
     const text = newMessage.trim();
@@ -46,14 +55,15 @@ function Chat({ currentUser, socket }) {
 
   // UI를 위한 헬퍼 함수 (메시지 렌더링)
   const renderMessageBubble = (messageData) => {
-    // 'chatHandler.js'에 따라 데이터 형식을 맞춥니다.
-    // { from: userId, text: msg, timestamp: Date() }
     const { from, text, timestamp } = messageData;
-    const isMe = from === currentUser?.user_id; // 현재 로그인한 유저 ID와 비교
+    const isMe = from === currentUser?.user_id;
 
     const alignment = isMe ? 'justify-end' : 'justify-start';
     const bubbleColor = isMe ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800';
-    const name = isMe ? '나' : from; // 실제로는 username으로 대체해야 합니다.
+
+    // 4. [핵심 수정] userMap에서 username 가져오기
+    const name = isMe ? '나' : userMap.get(from) || '알 수 없음';
+
     const time = new Date(timestamp).toLocaleTimeString('ko-KR', {
       hour: '2-digit',
       minute: '2-digit',
