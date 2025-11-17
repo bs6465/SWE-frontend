@@ -100,7 +100,7 @@ function Chat({ currentUser, socket, teamMembers }) {
             className="text-center text-gray-500 mt-20"
             style={{ display: 'block' }}
           >
-            채팅 내역 없음 (실시간 채팅만 지원)
+            현재 팀 실시간 채팅만 지원
           </div>
 
           {/* 2. 메시지 목록 렌더링 */}
