@@ -25,7 +25,7 @@ RUN npm run build
 # 2. 서빙(Serve) 스테이지
 # ------------------------------------
 # 방금 질문하셨던 Nginx의 alpine 버전을 사용 (매우 가벼움)
-FROM nginx:latest
+FROM nginx:alpine
 
 # 빌드 스테이지('builder')에서 생성된 /app/build 폴더의 내용물 전체를
 # Nginx의 기본 HTML 서빙 폴더로 복사
