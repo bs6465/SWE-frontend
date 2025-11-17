@@ -1,7 +1,7 @@
 // src/components/Chat.jsx
 
 // 1. { io } import 제거!
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 function Chat({ currentUser, socket }) {
   const [messages, setMessages] = useState([]);
