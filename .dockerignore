@@ -1,0 +1,14 @@
+# 로컬 의존성 폴더는 제외
+node_modules
+
+# 빌드 결과물 제외 (컨테이너 내부에서 생성할 것이므로)
+build
+dist
+
+# 기타
+.git
+.gitignore
+.env
+.dockerignore
+Dockerfile
+README.md

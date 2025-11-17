@@ -1,0 +1,41 @@
+/* src/index.css */
+
+@import 'tailwindcss';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 디자이너가 <style> 태그에 넣었던 커스텀 CSS를 여기 붙여넣습니다 */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f7f9fc;
+}
+.scrollable-card {
+  /* ... */
+}
+.calendar-cell {
+  /* ... */
+}
+/* ... (HTML의 style 태그 안의 모든 내용) ... */
+
+/* --- 여기에 모달 CSS 추가 (src/modal.css 내용) --- */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/70 z-50 flex justify-center items-center;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl p-6 w-full max-w-lg;
+  animation: modal-scale-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modal-scale-in {
+  from {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
