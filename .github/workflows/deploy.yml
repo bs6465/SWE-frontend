@@ -1,5 +1,5 @@
 # .github/workflows/docker-build-push.yml
-name: SWE-frontend
+name: Build and Push Docker Image
 
 # main 브랜치에 push 이벤트가 발생했을 때 실행
 on:
