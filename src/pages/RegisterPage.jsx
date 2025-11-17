@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // 👈 Link 추가
 
-const API_URL = import.meta.env.VITE_API_URL; // 백엔드 주소 (가정)
-
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

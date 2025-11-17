@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function CreateTeamPage() {
   const [teamName, setTeamName] = useState('');
   const [error, setError] = useState(null);

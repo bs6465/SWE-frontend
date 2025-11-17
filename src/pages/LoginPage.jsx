@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // 👈 페이지 이동을 위한 Hook
 
-const API_URL = import.meta.env.VITE_API_URL; // 👈 백엔드 주소 (가정)
-
 function LoginPage() {
   // 1. username과 password를 위한 State
   const [username, setUsername] = useState('');

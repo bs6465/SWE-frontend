@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from 'react'; // 👈 useState, useEffect 추가
 import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa'; // 👈 아이콘 추가
 
-// const API_URL = import.meta.env.VITE_API_URL;
-
 // [수정] props 이름을 'project'에서 'schedule'로 변경 (가독성 위해)
 function ProjectModal({ isOpen, onClose, project: schedule }) {
   const [tasks, setTasks] = useState([]); // 👈 [신규] 체크리스트 목록 State
