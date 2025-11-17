@@ -150,7 +150,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
 
         {/* Task 목록 */}
         <div className="max-h-40 overflow-y-auto space-y-2 mb-4">
-          {tasks.length > 0 ? (
+          {tasks?.length > 0 ? (
             tasks.map((task) => (
               <div
                 key={task.task_id}
