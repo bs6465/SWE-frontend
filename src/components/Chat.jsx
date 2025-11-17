@@ -3,7 +3,7 @@
 // 1. { io } import 제거!
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
-function Chat({ currentUser, socket }) {
+function Chat({ currentUser, socket, teamMembers }) {
   const [messages, setMessages] = useState([]);
   // const [isConnected, setIsConnected] = useState(false); // 👈 App.jsx가 관리
   const currentUserId = currentUser ? currentUser.user_id : null;
@@ -34,8 +34,10 @@ function Chat({ currentUser, socket }) {
   // teamMembers 목록이 바뀔 때만 다시 계산 (성능 최적화)
   const userMap = useMemo(() => {
     const map = new Map();
-    teamMembers.forEach((member) => {
-      map.set(member.user_id, member.username); // user_id를 key로, username을 value로
+
+    // 👇 [수정] teamMembers가 undefined일 때를 대비해 '?.' 추가
+    teamMembers?.forEach((member) => {
+      map.set(member.user_id, member.username);
     });
     return map;
   }, [teamMembers]);
