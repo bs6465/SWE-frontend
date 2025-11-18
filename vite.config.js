@@ -15,27 +15,19 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(), // <-- 2. 여기에도 추가
     ],
+
     server: {
-      // 2. Nginx의 proxy_pass 역할
-      proxy: {
-        '/api': {
-          target: env.BACKEND_URL, // .env의 BACKEND_URL 값을 여기서 사용
-          changeOrigin: true,
-          // 필요하다면 경로 재작성도 가능
-          // rewrite: (path) => path.replace(/^\/api/, ''),
-        },
-        '/socket.io': {
-          target: env.BACKEND_URL,
-          ws: true, // 웹소켓 지원
-          changeOrigin: true,
-        },
+      '/api': {
+        target: env.BACKEND_URL, // .env의 BACKEND_URL 값을 여기서 사용
+        changeOrigin: true,
+        // 필요하다면 경로 재작성도 가능
+        // rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/socket.io': {
+        target: env.BACKEND_URL,
+        ws: true, // 웹소켓 지원
+        changeOrigin: true,
       },
     },
   };
-});
-({
-  plugins: [
-    react(),
-    tailwindcss(), // <-- 2. 여기에도 추가
-  ],
 });

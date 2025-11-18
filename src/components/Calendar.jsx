@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 
-// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 // 헬퍼 함수: 날짜를 'YYYY-MM-DD' 형식으로 변환
 const toYYYYMMDD = (date) => date.toISOString().split('T')[0];
@@ -28,13 +28,10 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
     // 백엔드 API 호출 ('getSchedulesByMonth')
     const fetchSchedules = async () => {
       try {
-        const response = await fetch(
-          `/api/schedules/month?year=${year}&month=${month}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            cache: 'no-store', // 캐시 방지
-          },
-        );
+        const response = await fetch(`${API_URL}/api/schedules/month?year=${year}&month=${month}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store', // 캐시 방지
+        });
         if (!response.ok) throw new Error('일정 로드 실패');
 
         const data = await response.json();

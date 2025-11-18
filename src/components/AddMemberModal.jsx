@@ -1,7 +1,7 @@
 // src/components/AddMemberModal.jsx
 import React, { useState } from 'react';
 
-// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AddMemberModal({ isOpen, onClose, currentUser }) {
   const [addUserId, setAddUserId] = useState('');
@@ -21,7 +21,7 @@ function AddMemberModal({ isOpen, onClose, currentUser }) {
     }
 
     try {
-      const response = await fetch(`/api/team/members`, {
+      const response = await fetch(`${API_URL}/api/team/members`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -11,7 +11,7 @@ import CreateScheduleModal from './components/CreateScheduleModal';
 import AddMemberModal from './components/AddMemberModal';
 import { useNavigate } from 'react-router-dom'; // 401 에러 시 로그아웃 처리용
 
-// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const socket = io({
   autoConnect: false, // 아직 자동 연결은 안 함
@@ -54,7 +54,7 @@ function App() {
     // API 호출: 전체 팀원 목록 가져오기
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch(`/api/team/`, {
+        const response = await fetch(`${API_URL}/api/team/`, {
           method: 'GET',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -72,7 +72,7 @@ function App() {
     // 토큰이 있으면, /api/auth/me 호출
     const fetchMe = async () => {
       try {
-        const response = await fetch(`/api/auth/me`, {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
