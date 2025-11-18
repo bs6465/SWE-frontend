@@ -1,7 +1,7 @@
 // src/components/CreateScheduleModal.jsx
 import React, { useState } from 'react';
 
-API_URL = process.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function CreateScheduleModal({ isOpen, onClose }) {
   // 1. 폼 입력을 위한 State

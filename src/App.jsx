@@ -11,7 +11,7 @@ import CreateScheduleModal from './components/CreateScheduleModal';
 import AddMemberModal from './components/AddMemberModal';
 import { useNavigate } from 'react-router-dom'; // 401 에러 시 로그아웃 처리용
 
-API_URL = process.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const socket = io({
   autoConnect: false, // 아직 자동 연결은 안 함

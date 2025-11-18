@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 
-API_URL = process.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ProjectModal({ isOpen, onClose, project: schedule }) {
   const [tasks, setTasks] = useState([]);
