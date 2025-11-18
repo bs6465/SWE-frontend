@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function LoginPage() {
   // 1. username과 password를 위한 State
   const [username, setUsername] = useState('');
@@ -17,8 +15,8 @@ function LoginPage() {
     setError(null);
 
     try {
-      // 3. 백엔드 auth.controller.js의 'login' 함수 호출 ${API_URL}/
-      const response = await fetch(`http://backend:3000/api/auth/login/`, {
+      // 3. 백엔드 auth.controller.js의 'login' 함수 호출
+      const response = await fetch(`/api/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
