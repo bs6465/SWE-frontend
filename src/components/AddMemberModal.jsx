@@ -1,7 +1,7 @@
 // src/components/AddMemberModal.jsx
 import React, { useState } from 'react';
 
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
 
 function AddMemberModal({ isOpen, onClose, currentUser }) {
   const [addUserId, setAddUserId] = useState('');
