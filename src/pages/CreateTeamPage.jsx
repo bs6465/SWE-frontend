@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+API_URL = process.env.VITE_API_URL;
+
 function CreateTeamPage() {
   const [teamName, setTeamName] = useState('');
   const [error, setError] = useState(null);
@@ -17,7 +19,7 @@ function CreateTeamPage() {
     }
 
     try {
-      const response = await fetch(`/api/team`, {
+      const response = await fetch(`/${API_URL}/api/team`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

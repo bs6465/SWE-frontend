@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
+API_URL = process.env.VITE_API_URL;
+
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +18,7 @@ function RegisterPage() {
 
     try {
       // 백엔드 auth.controller.js의 'register' 함수 호출
-      const response = await fetch(`/api/auth/register`, {
+      const response = await fetch(`/${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

@@ -1,6 +1,8 @@
 // src/components/CreateScheduleModal.jsx
 import React, { useState } from 'react';
 
+API_URL = process.env.VITE_API_URL;
+
 function CreateScheduleModal({ isOpen, onClose }) {
   // 1. 폼 입력을 위한 State
   const [title, setTitle] = useState('');
@@ -22,7 +24,7 @@ function CreateScheduleModal({ isOpen, onClose }) {
     const finalColor = color.toUpperCase();
 
     try {
-      const response = await fetch('/api/schedules', {
+      const response = await fetch(`/${API_URL}/api/schedules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

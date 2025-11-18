@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 
+API_URL = process.env.VITE_API_URL;
+
 function ProjectModal({ isOpen, onClose, project: schedule }) {
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -23,7 +25,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
 
     const fetchTasks = async () => {
       try {
-        const response = await fetch(`/api/task/${scheduleId}`, {
+        const response = await fetch(`/${API_URL}/api/task/${scheduleId}`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
         });
@@ -45,7 +47,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
     if (!newTaskTitle.trim()) return;
 
     try {
-      const response = await fetch(`/api/task/${scheduleId}`, {
+      const response = await fetch(`/${API_URL}/api/task/${scheduleId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: newTaskTitle, managerId: null, due_date: null }), //
@@ -66,7 +68,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
   // 완료/미완료 핸들러
   const handleToggleComplete = async (taskId, isCompleted) => {
     try {
-      const response = await fetch(`/api/task/${taskId}`, {
+      const response = await fetch(`/${API_URL}/api/task/${taskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ isCompleted: !isCompleted }),
@@ -85,7 +87,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
   // 삭제 핸들러
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(`/api/task/${taskId}`, {
+      const response = await fetch(`/${API_URL}/api/task/${taskId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

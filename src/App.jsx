@@ -72,7 +72,7 @@ function App() {
     // 토큰이 있으면, /api/auth/me 호출
     const fetchMe = async () => {
       try {
-        const response = await fetch(`/api/auth/me`, {
+        const response = await fetch(`/${API_URL}/api/auth/me`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
