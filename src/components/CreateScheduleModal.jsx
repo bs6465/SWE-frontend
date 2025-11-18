@@ -16,13 +16,12 @@ function CreateScheduleModal({ isOpen, onClose }) {
     e.preventDefault();
     setError(null);
 
-    // --- 👇 [핵심] 여기서 데이터 변환 ---
+    // 데이터 변환
     const startISO = new Date(startTime).toISOString();
     const endISO = new Date(endTime).toISOString();
-    const finalColor = color.toUpperCase(); // 👈 이 줄 추가
+    const finalColor = color.toUpperCase();
 
     try {
-      // 2. 백엔드 API 호출 ('schedule.controller.js'의 'createSchedule')
       const response = await fetch('/api/schedules', {
         method: 'POST',
         headers: {
@@ -86,7 +85,6 @@ function CreateScheduleModal({ isOpen, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">시작 (날짜/시간) *</label>
-              {/* [수정!] type="date" -> "datetime-local" */}
               <input
                 type="datetime-local"
                 required
@@ -97,7 +95,6 @@ function CreateScheduleModal({ isOpen, onClose }) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">종료 (날짜/시간) *</label>
-              {/* [수정!] type="date" -> "datetime-local" */}
               <input
                 type="datetime-local"
                 required

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // 👈 페이지 이동을 위한 Hook
+import { useNavigate, Link } from 'react-router-dom';
 
 function LoginPage() {
   // 1. username과 password를 위한 State
@@ -7,7 +7,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
-  const navigate = useNavigate(); // 👈 로그인 성공 시 페이지 이동용
+  const navigate = useNavigate(); // 로그인 성공 시 페이지 이동용
 
   // 2. 로그인 제출 핸들러
   const handleLogin = async (e) => {

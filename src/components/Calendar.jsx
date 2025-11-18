@@ -27,31 +27,29 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
     const fetchSchedules = async () => {
       try {
         const response = await fetch(
-          `/api/schedules/month?year=${year}&month=${month}`, // 👈 API 경로
+          `/api/schedules/month?year=${year}&month=${month}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-            cache: 'no-store', // 👈 캐시 방지
+            cache: 'no-store', // 캐시 방지
           },
         );
         if (!response.ok) throw new Error('일정 로드 실패');
 
         const data = await response.json();
-        setSchedules(data); // 👈 불러온 일정을 State에 저장
+        setSchedules(data); // 불러온 일정을 State에 저장
       } catch (err) {
         console.error('캘린더 일정 로드 오류:', err);
       }
     };
 
     fetchSchedules();
-  }, [currentDate, currentUser, token]); // 👈 월이 바뀌거나 유저가 확정될 때
+  }, [currentDate, currentUser, token]); // 월이 바뀌거나 유저가 확정될 때
 
   // 4. [Socket.io Effect]
   // 컴포넌트가 마운트될 때 딱 한 번 실행
   useEffect(() => {
-    if (!socket) return; // 소켓이 없으면 중단
+    if (!socket) return;
 
-    // 이벤트 리스너: 다른 유저가 일정 추가
-    // 'schedule.controller.js'의 'createSchedule'
     const handleScheduleAdded = (data) => {
       console.log('소켓: 일정 추가됨', data.schedule);
       // TODO: 이번 달에 해당하는 일정인지 확인하는 로직 (선택 사항)
@@ -90,7 +88,7 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
       socket.off('isTaskCompletedChanged', handleTaskChange);
       socket.off('deleteTask', handleTaskChange);
     };
-  }, [socket]); // 👈 socket 객체가 확정될 때
+  }, [socket]); // socket 객체가 확정될 때
 
   // 5. [렌더링 로직] 현재 월의 날짜 배열 생성 (useMemo로 캐싱)
   const calendarGrid = useMemo(() => {
@@ -111,7 +109,7 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = toYYYYMMDD(new Date(year, month, day));
 
-      // [중요] 해당 날짜(dateStr)에 포함되는 일정들을 필터링
+      // 해당 날짜(dateStr)에 포함되는 일정들을 필터링
       const dayEvents = schedules.filter((schedule) => {
         const startDate = toYYYYMMDD(new Date(schedule.start_time));
         // const endDate = toYYYYMMDD(new Date(schedule.end_time));
@@ -122,7 +120,7 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
     }
 
     return days;
-  }, [currentDate, schedules]); // 👈 월이 바뀌거나 일정이 바뀌면 재계산
+  }, [currentDate, schedules]); // 월이 바뀌거나 일정이 바뀌면 재계산
 
   // 6. [핸들러] 월 변경
   const goToPreviousMonth = () => {
@@ -140,9 +138,9 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
           {`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`}
         </h2>
         <div className="space-x-2">
-          {/* 2. [신규] '+ 일정 추가' 버튼 */}
+          {/* 2. '+ 일정 추가' 버튼 */}
           <button
-            onClick={onAddScheduleClick} // 👈 App.jsx가 넘겨준 함수 호출
+            onClick={onAddScheduleClick} // App.jsx가 넘겨준 함수 호출
             className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-semibold"
           >
             + 일정 추가
@@ -182,7 +180,7 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
             >
               <span className="day-number text-gray-700">{dayInfo.date}</span>
 
-              {/* [중요] 이벤트 렌더링 */}
+              {/* 이벤트 렌더링 */}
               <div className="mt-1 space-y-1">
                 {dayInfo.events.map((event) => (
                   <div
@@ -191,7 +189,7 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
                     onClick={() => onEventClick(event)}
                     className="event-container p-1 rounded-md text-white text-xs truncate"
                     // 'schedule.controller.js'의 'color' 필드 사용
-                    style={{ backgroundColor: event.color || '#6366f1' }} // 👈 기본색(indigo)
+                    style={{ backgroundColor: event.color || '#6366f1' }} // 기본색(indigo)
                   >
                     {event.title}
                   </div>

@@ -14,14 +14,13 @@ function AddMemberModal({ isOpen, onClose, currentUser }) {
     setError(null);
     setMessage(null);
 
-    // [참고] 백엔드에서 팀원 추가는 팀 오너만 가능하도록 검증하고 있습니다.
+    // 백엔드에서 팀원 추가는 팀 오너만 가능하도록 검증
     if (currentUser.user_id === addUserId) {
       setError('자기 자신은 추가할 수 없습니다.');
       return;
     }
 
     try {
-      // 1. API 호출 (team.controller.js의 addMember)
       const response = await fetch(`/api/team/members`, {
         method: 'POST',
         headers: {

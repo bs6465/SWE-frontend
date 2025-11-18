@@ -1,54 +1,51 @@
 // src/components/ProjectModal.jsx
 
-import React, { useState, useEffect } from 'react'; // 👈 useState, useEffect 추가
-import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa'; // 👈 아이콘 추가
+import React, { useState, useEffect } from 'react';
+import { FaTrash, FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 
-// [수정] props 이름을 'project'에서 'schedule'로 변경 (가독성 위해)
 function ProjectModal({ isOpen, onClose, project: schedule }) {
-  const [tasks, setTasks] = useState([]); // 👈 [신규] 체크리스트 목록 State
-  const [newTaskTitle, setNewTaskTitle] = useState(''); // 👈 새 체크리스트 제목 State
+  const [tasks, setTasks] = useState([]);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
   const [error, setError] = useState(null);
   const token = localStorage.getItem('token');
 
   // schedule_id가 없을 경우를 대비 (모달이 닫히면 project가 null이 됨)
   const scheduleId = schedule?.schedule_id;
 
-  // [신규] 진행률 계산
+  // 진행률 계산
   const completedTasks = tasks.filter((t) => t.is_completed).length;
   const totalTasks = tasks.length;
   const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  // [신규] 1. Task 목록 API 호출 (모달이 열릴 때마다 실행)
+  // Task 목록 API 호출 (모달이 열릴 때마다 실행)
   useEffect(() => {
     if (!scheduleId || !token) return;
 
     const fetchTasks = async () => {
       try {
         const response = await fetch(`/api/task/${scheduleId}`, {
-          // 👈 [API] GET /api/task/:scheduleId
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
         });
         if (!response.ok) throw new Error('체크리스트 로드 실패');
 
         const data = await response.json(); //
-        setTasks(data); // 👈 Task 목록 저장
+        setTasks(data);
       } catch (err) {
         console.error('Task 로드 오류:', err);
         setError('체크리스트 로드 실패');
       }
     };
     fetchTasks();
-  }, [scheduleId, token]); // 👈 scheduleId가 바뀔 때마다 실행
+  }, [scheduleId, token]); // scheduleId가 바뀔 때마다 실행
 
-  // 2. [신규] Task 생성 핸들러
+  // Task 생성 핸들러
   const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
 
     try {
       const response = await fetch(`/api/task/${scheduleId}`, {
-        // 👈 [API] POST /api/task/:scheduleId
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: newTaskTitle, managerId: null, due_date: null }), //
@@ -57,7 +54,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
 
       const data = await response.json(); // { task: 새 task 객체, message: ... }
 
-      // [신규] Socket.io를 통해 다른 유저에게 알림이 가겠지만,
+      // Socket.io를 통해 다른 유저에게 알림이 가겠지만,
       // 현재 유저는 State를 직접 업데이트합니다.
       setTasks((prevTasks) => [...prevTasks, data.task]);
       setNewTaskTitle('');
@@ -66,14 +63,13 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
     }
   };
 
-  // 3. [신규] 완료/미완료 핸들러
+  // 완료/미완료 핸들러
   const handleToggleComplete = async (taskId, isCompleted) => {
     try {
       const response = await fetch(`/api/task/${taskId}`, {
-        // 👈 [API] PUT /api/task/complete/:taskId
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ isCompleted: !isCompleted }), //
+        body: JSON.stringify({ isCompleted: !isCompleted }),
       });
       if (!response.ok) throw new Error('상태 변경 실패');
 
@@ -86,11 +82,10 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
     }
   };
 
-  // 4. [신규] 삭제 핸들러
+  // 삭제 핸들러
   const handleDeleteTask = async (taskId) => {
     try {
       const response = await fetch(`/api/task/${taskId}`, {
-        // 👈 [API] DELETE /api/task/delete/:taskId
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -119,7 +114,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
           <span className="text-sm font-semibold">{schedule.status || '미지정'}</span>
         </div>
 
-        {/* 1. 진행률 바 (신규) */}
+        {/* 1. 진행률 바 */}
         <div className="my-4">
           <p className="text-sm font-medium mb-1">
             진행률: {progressPercent}% ({completedTasks}/{totalTasks})
@@ -145,7 +140,7 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
 
         <hr className="my-4" />
 
-        {/* 3. 체크리스트 (Task) 섹션 (신규) */}
+        {/* 3. 체크리스트 (Task) 섹션 */}
         <h3 className="text-xl font-semibold mb-3">체크리스트 ({totalTasks}개)</h3>
 
         {/* Task 목록 */}

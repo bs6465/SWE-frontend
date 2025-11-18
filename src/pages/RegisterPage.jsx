@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // 👈 Link 추가
+import { useNavigate, Link } from 'react-router-dom';
 
 function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -15,9 +15,8 @@ function RegisterPage() {
     setSuccess(null);
 
     try {
-      // 1. 백엔드 auth.controller.js의 'register' 함수 호출
+      // 백엔드 auth.controller.js의 'register' 함수 호출
       const response = await fetch(`/api/auth/register`, {
-        // 👈 API 경로 (가정)
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -29,7 +28,6 @@ function RegisterPage() {
         throw new Error(data.message || '회원가입 실패');
       }
 
-      // 2. 회원가입 성공!
       setSuccess('회원가입 성공! 로그인 페이지로 이동합니다...');
 
       // 3초 뒤 로그인 페이지로 자동 이동

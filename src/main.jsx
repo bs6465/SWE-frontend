@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import App from './App.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx'; // 👈 1단계에서 만든 회원가입 페이지
+import RegisterPage from './pages/RegisterPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import CreateTeamPage from './pages/CreateTeamPage.jsx';
 
@@ -30,7 +30,6 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    // 👇 이 블록을 추가하세요
     path: '/register',
     element: <RegisterPage />,
   },

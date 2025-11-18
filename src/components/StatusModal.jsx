@@ -1,14 +1,14 @@
 // src/components/StatusModal.jsx
-import React, { useMemo } from 'react'; // 👈 useMemo 추가
+import React, { useMemo } from 'react'; // useMemo 추가
 
-// 1. [수정] props 받기
+//  props 받기
 function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberClick }) {
   if (!isOpen) {
     return null;
   }
 
-  // 2. [신규] 'onlineUsers'는 ID 목록(예: ['user_id_abc'])일 수 있으므로
-  //    빠른 조회를 위해 Set으로 변환합니다. (성능 최적화)
+  //'onlineUsers'는 ID 목록(예: ['user_id_abc'])일 수 있으므로
+  // 빠른 조회를 위해 Set으로 변환합니다. (성능 최적화)
   const onlineUserSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
 
   return (
@@ -16,11 +16,9 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberCli
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-2xl font-bold mb-4">팀원 현황 (실시간)</h2>
 
-        {/* 3. [수정] 하드코딩된 텍스트 대신, 실제 목록을 map으로 렌더링 */}
         <div className="space-y-3 max-h-60 overflow-y-auto">
           {teamMembers?.length > 0 ? (
             teamMembers.map((member) => {
-              // 4. [신규] 이 멤버가 onlineUserSet에 있는지 확인
               const isOnline = onlineUserSet.has(member.user_id);
 
               return (
@@ -48,7 +46,7 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberCli
         </div>
 
         <button
-          onClick={onAddMemberClick} // 👈 App.jsx의 핸들러 호출
+          onClick={onAddMemberClick} // App.jsx의 핸들러 호출
           className="mt-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 w-full"
         >
           + 새 팀원 추가

@@ -21,9 +21,9 @@ function CreateTeamPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // 👈 인증 필수
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ teamName }), // 👈 예시 body
+        body: JSON.stringify({ teamName }),
       });
 
       const data = await response.json();
@@ -32,11 +32,7 @@ function CreateTeamPage() {
         throw new Error(data.message || '팀 생성에 실패했습니다.');
       }
 
-      // 팀 생성 성공!
-      // (중요) 백엔드가 보내준 토큰을 브라우저 저장소(localStorage)에 저장
-      // 메인 대시보드('/')로 돌아갑니다.
-      // App.jsx의 useEffect가 다시 실행되면서 getMe를 호출할 것이고,
-      // 이번에는 team_id가 있으므로 대시보드가 정상 로드됩니다.
+      // 팀 생성 성공
       localStorage.setItem('token', data.token);
       navigate('/');
     } catch (err) {

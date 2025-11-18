@@ -5,51 +5,43 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 function Chat({ currentUser, socket, teamMembers }) {
   const [messages, setMessages] = useState([]);
-  // const [isConnected, setIsConnected] = useState(false); // 👈 App.jsx가 관리
   const currentUserId = currentUser ? currentUser.user_id : null;
   const [newMessage, setNewMessage] = useState('');
   const chatMessagesEndRef = useRef(null);
 
   useEffect(() => {
-    // 4. [수정] socket이 없거나 유저 ID가 없으면 아무것도 안 함
     if (!socket || !currentUserId) return;
 
     // 'chatHandler.js' 기반
     socket.on('newTeamMessage', (messageData) => {
-      // 'messageData'의 형식이 { from, text, timestamp }일 수 있습니다.
-      // 백엔드 코드와 React UI 간의 데이터 형식 매핑이 필요할 수 있습니다.
-      // (예: { user_id: messageData.from, message_text: messageData.text, ... })
-
-      // 임시: 백엔드가 보낸 형식을 그대로 State에 저장한다고 가정
       setMessages((prevMessages) => [...prevMessages, messageData]);
     });
 
-    // 7. [수정] 리스너 정리
+    // 리스너 정리
     return () => {
       socket.off('newChatMessage');
     };
-    // 8. [수정] 의존성 배열에 socket 추가
+    // 의존성 배열에 socket 추가
   }, [currentUserId, socket]);
 
   // teamMembers 목록이 바뀔 때만 다시 계산 (성능 최적화)
   const userMap = useMemo(() => {
     const map = new Map();
 
-    // 👇 [수정] teamMembers가 undefined일 때를 대비해 '?.' 추가
+    // teamMembers가 undefined일 때를 대비해 '?.' 추가
     teamMembers?.forEach((member) => {
       map.set(member.user_id, member.username);
     });
     return map;
   }, [teamMembers]);
 
-  // [수정] 보낼 때도 'sendTeamMessage' 사용
+  // 보낼 때도 'sendTeamMessage' 사용
   const sendMessage = () => {
     const text = newMessage.trim();
     if (!text || !socket || !socket.connected) return;
 
     socket.emit('sendTeamMessage', {
-      // 👈 [이벤트 수정]
-      msg: text, // 👈 'chatHandler.js'에 맞게 'msg' 키 사용
+      msg: text,
     });
 
     setNewMessage('');
@@ -63,7 +55,7 @@ function Chat({ currentUser, socket, teamMembers }) {
     const alignment = isMe ? 'justify-end' : 'justify-start';
     const bubbleColor = isMe ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800';
 
-    // 4. [핵심 수정] userMap에서 username 가져오기
+    // userMap에서 username 가져오기
     const name = isMe ? '나' : userMap.get(from) || '알 수 없음';
 
     const time = new Date(timestamp).toLocaleTimeString('ko-KR', {
