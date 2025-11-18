@@ -18,7 +18,7 @@ function LoginPage() {
 
     try {
       // 3. 백엔드 auth.controller.js의 'login' 함수 호출
-      const response = await fetch(`${API_URL}/api/auth/login/`, {
+      const response = await fetch(`/api/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
