@@ -17,8 +17,8 @@ function LoginPage() {
     setError(null);
 
     try {
-      // 3. 백엔드 auth.controller.js의 'login' 함수 호출
-      const response = await fetch(`${API_URL}/api/auth/login/`, {
+      // 3. 백엔드 auth.controller.js의 'login' 함수 호출 ${API_URL}/
+      const response = await fetch(`http://backend:3000/api/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
