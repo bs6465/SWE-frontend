@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import CreateTeamPage from './pages/CreateTeamPage.jsx';
+import InviteHandler from './pages/InviteHandler';
 
 import './index.css';
 
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  {
+    path: '/invite/:teamId',
+    element: <InviteHandler />,
   },
 ]);
 

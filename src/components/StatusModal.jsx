@@ -113,11 +113,34 @@ function StatusModal({
     }
   };
 
+  // 초대 링크 복사 핸들러
+  const handleCopyInviteLink = () => {
+    // 현재 브라우저 주소 기반으로 링크 생성
+    const inviteUrl = `${window.location.origin}/invite/${currentUser.team_id}`; // teamOwnerId 대신 내 team_id 사용
+
+    navigator.clipboard
+      .writeText(inviteUrl)
+      .then(() => {
+        alert('초대 링크가 클립보드에 복사되었습니다!\n' + inviteUrl);
+      })
+      .catch((err) => {
+        console.error('복사 실패', err);
+        prompt('이 링크를 복사하세요:', inviteUrl);
+      });
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-2xl font-bold mb-4">
           팀원 현황 {isMeOwner && <span className="text-sm text-indigo-500">(팀장)</span>}
+          <button
+            onClick={handleCopyInviteLink}
+            className="ml-2 text-sm bg-indigo-100 text-indigo-600 px-2 py-1 rounded hover:bg-indigo-200"
+            title="초대 링크 복사"
+          >
+            🔗 초대 링크
+          </button>
         </h2>
 
         <div className="space-y-3 max-h-60 overflow-y-auto mb-6">

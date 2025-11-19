@@ -93,8 +93,14 @@ function App() {
         }
 
         const userData = await response.json();
-
         setCurrentUser(userData);
+
+        // --- 대기 중인 초대 수락 로직 ---
+        const pendingTeamId = localStorage.getItem('pendingInviteTeamId');
+        if (pendingTeamId && !userData.team_id) {
+          navigate(`/invite/${pendingTeamId}`);
+          return;
+        }
 
         // teamId 있으면 팀 화면으로 이동
         if (!userData.team_id) {
