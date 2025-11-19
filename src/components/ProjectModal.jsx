@@ -39,6 +39,28 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
     fetchTasks();
   }, [scheduleId, token]); // scheduleId가 바뀔 때마다 실행
 
+  // 일정 삭제 핸들러
+  const handleDeleteSchedule = async () => {
+    if (!window.confirm('정말로 이 일정을 삭제하시겠습니까? (체크리스트도 모두 삭제됩니다)'))
+      return;
+
+    try {
+      const response = await fetch(`/api/schedules/${schedule.schedule_id}`, {
+        //
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('일정 삭제 실패');
+
+      // 성공 시 모달 닫기
+      // (Socket.io가 'scheduleRemoved' 이벤트를 보내므로 캘린더는 자동 갱신됨)
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   // Task 생성 핸들러
   const handleCreateTask = async (e) => {
     e.preventDefault();
@@ -112,6 +134,18 @@ function ProjectModal({ isOpen, onClose, project: schedule }) {
         <div className="flex justify-between items-center mb-2 border-b pb-2">
           <h2 className="text-2xl font-bold">{schedule.title}</h2>
           <span className="text-sm font-semibold">{schedule.status || '미지정'}</span>
+        </div>
+
+        {/* 우측 상단 삭제 버튼 */}
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-semibold">{schedule.status || '미지정'}</span>
+          <button
+            onClick={handleDeleteSchedule}
+            className="text-red-500 hover:text-red-700 p-1 rounded"
+            title="일정 삭제"
+          >
+            <FaTrash />
+          </button>
         </div>
 
         {/* 1. 진행률 바 */}

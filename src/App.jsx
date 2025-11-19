@@ -9,6 +9,7 @@ import Calendar from './components/Calendar'; // Calendar import
 import ProjectModal from './components/ProjectModal'; // ProjectModal import
 import CreateScheduleModal from './components/CreateScheduleModal';
 import AddMemberModal from './components/AddMemberModal';
+import Header from './components/Header';
 import { useNavigate } from 'react-router-dom'; // 401 에러 시 로그아웃 처리용
 
 const socket = io({
@@ -48,7 +49,6 @@ function App() {
       return;
     }
 
-    
     // API 호출: 전체 팀원 목록 가져오기
     const fetchTeamMembers = async () => {
       try {
@@ -148,6 +148,11 @@ function App() {
     setModalState((prev) => ({ ...prev, status: true }));
   };
 
+  const handleLeaveSuccess = () => {
+    if (socket) socket.disconnect();
+    navigate('/create-team');
+  };
+
   // --- TimezoneModal 핸들러 ---
   const handleOpenTimezoneModal = () => {
     alert('Timezone 모달은 아직 만들지 않았습니다.');
@@ -181,6 +186,7 @@ function App() {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-8">
       {/* ... (Header) ... */}
+      <Header currentUser={currentUser} socket={socket} />
 
       <StatusCards
         onStatusClick={handleOpenStatusModal}
@@ -208,6 +214,7 @@ function App() {
         teamMembers={teamMembers}
         onlineUsers={onlineUsers}
         onAddMemberClick={handleOpenAddMemberModal}
+        onLeaveSuccess={handleLeaveSuccess}
       />
 
       <AddMemberModal

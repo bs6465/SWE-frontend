@@ -1,8 +1,15 @@
 // src/components/StatusModal.jsx
-import React, { useMemo } from 'react'; // useMemo 추가
+import React, { useMemo, useState } from 'react'; // useMemo 추가
 
 //  props 받기
-function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberClick }) {
+function StatusModal({
+  isOpen,
+  onClose,
+  teamMembers,
+  onlineUsers,
+  onAddMemberClick,
+  onLeaveSuccess,
+}) {
   if (!isOpen) {
     return null;
   }
@@ -10,6 +17,40 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberCli
   //'onlineUsers'는 ID 목록(예: ['user_id_abc'])일 수 있으므로
   // 빠른 조회를 위해 Set으로 변환합니다. (성능 최적화)
   const onlineUserSet = useMemo(() => new Set(onlineUsers), [onlineUsers]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 팀 나가기
+  const handleLeaveTeam = async () => {
+    if (!window.confirm('정말로 팀을 나가시겠습니까?')) return;
+
+    setIsLoading(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch('/api/team/me', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || '팀 나가기 실패');
+
+      // 성공 처리
+      // 로컬 스토리지 업데이트 (팀 정보 없는 새 토큰)
+      localStorage.setItem('token', data.token);
+
+      alert('팀에서 나왔습니다.');
+
+      // 부모(App.jsx)에게 "성공했으니 후처리해라"고 알림
+      onLeaveSuccess();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -57,6 +98,16 @@ function StatusModal({ isOpen, onClose, teamMembers, onlineUsers, onAddMemberCli
           className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
         >
           닫기
+        </button>
+
+        <hr className="border-gray-200" />
+
+        {/* 팀 나가기 버튼 (위험하므로 빨간색/작은 글씨) */}
+        <button
+          onClick={handleLeaveTeam} // 👈 App.jsx에서 전달받은 핸들러 실행
+          className="w-full px-4 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+        >
+          팀 나가기
         </button>
       </div>
     </div>
