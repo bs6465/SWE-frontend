@@ -26,6 +26,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [openModal, setOpenModal] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [teamOwnerId, setTeamOwnerId] = useState(null);
 
   const [modalState, setModalState] = useState({
     status: false,
@@ -60,8 +61,10 @@ function App() {
           throw new Error('팀원 목록 로드 실패');
         }
 
-        const members = await response.json();
-        setTeamMembers(members); // State에 저장
+        const data = await response.json();
+
+        setTeamMembers(data.members); // 멤버 목록 저장
+        setTeamOwnerId(data.ownerId); // 팀장 ID 저장
       } catch (err) {
         console.error('팀원 목록 로드 오류:', err);
       }
@@ -213,6 +216,8 @@ function App() {
         onClose={handleCloseModal}
         teamMembers={teamMembers}
         onlineUsers={onlineUsers}
+        currentUser={currentUser}
+        teamOwnerId={teamOwnerId}
         onAddMemberClick={handleOpenAddMemberModal}
         onLeaveSuccess={handleLeaveSuccess}
       />
