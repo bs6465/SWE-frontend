@@ -12,3 +12,4 @@ dist
 .dockerignore
 Dockerfile
 README.md
+.prettierrc.json
