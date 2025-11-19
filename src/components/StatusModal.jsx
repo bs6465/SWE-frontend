@@ -113,20 +113,39 @@ function StatusModal({
     }
   };
 
-  // 초대 링크 복사 핸들러
+  // 초대 링크 복사 핸들러 (HTTP용)
   const handleCopyInviteLink = () => {
     // 현재 브라우저 주소 기반으로 링크 생성
     const inviteUrl = `${window.location.origin}/invite/${currentUser.team_id}`; // teamOwnerId 대신 내 team_id 사용
 
-    navigator.clipboard
-      .writeText(inviteUrl)
-      .then(() => {
-        alert('초대 링크가 클립보드에 복사되었습니다!\n' + inviteUrl);
-      })
-      .catch((err) => {
-        console.error('복사 실패', err);
-        prompt('이 링크를 복사하세요:', inviteUrl);
-      });
+    // 2. 구형 방식 (HTTP) 예비책 (Fallback)
+    // 화면에 안 보이는 textarea를 만들어서 복사 명령을 실행합니다.
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = inviteUrl;
+
+      // 화면 밖으로 보내서 안 보이게 처리
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        alert('초대 링크가 클립보드에 복사되었습니다!');
+      } else {
+        throw new Error('복사 명령 실패');
+      }
+    } catch (err) {
+      console.error('복사 실패:', err);
+      // 3. 진짜 다 안될 때: 사용자에게 직접 복사하라고 알림
+      prompt('아래 링크를 직접 복사해주세요:', inviteUrl);
+    }
   };
 
   return (
