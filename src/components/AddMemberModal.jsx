@@ -60,7 +60,7 @@ function AddMemberModal({ isOpen, onClose, currentUser }) {
               value={addUserId}
               onChange={(e) => setAddUserId(e.target.value)}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-lg"
-              placeholder="예: user-b4f7-..."
+              placeholder="예: user1234"
             />
           </div>
 
