@@ -198,7 +198,7 @@ function StatusModal({
             </button>
           ) : (
             <button
-              onClick={onLeaveSuccess}
+              onClick={handleLeaveTeam}
               className="w-full px-4 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
             >
               팀 나가기
