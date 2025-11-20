@@ -1,4 +1,4 @@
-백엔드 : [](https://github.com/bs6465/SWEtim)
+[백엔드 링크](https://github.com/bs6465/SWEtim)
 
 
 # TIM8 - 실시간 원격 협업 대시보드 (Real-time Collaboration Dashboard)
