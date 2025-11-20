@@ -9,8 +9,8 @@ graph TD
         
         subgraph Docker_Network [Docker Network]
             Frontend[Frontend Service<br/>React + Vite]
-            Backend[Backend Service<br/>Node.js + Express + Socket.io]
-            DB[(PostgreSQL<br/>Database)]
+            Backend[Backend Service<br/>Express + Socket.io]
+            DB[(PostgreSQL:18<br/>Database)]
         end
     end
 
