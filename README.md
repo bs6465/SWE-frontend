@@ -33,9 +33,9 @@ graph TD
     Nginx -- "Serve Static Files (/)" --> Frontend
     Nginx -- "API Request (/api)" --> Backend
     Nginx -- "Real-time (/socket.io)" --> Backend
-    Backend -- "Read/Write Data" --> DB
+    Backend -- "SQL Queries" --> DB
     %% Styling
-    style Nginx fill:#009688,stroke:#333,stroke-width:2px
+    style Nginx fill:#00C9DD,stroke:#333,stroke-width:2px
     style Backend fill:#6db33f,stroke:#333,stroke-width:2px
     style Frontend fill:#61dafb,stroke:#333,stroke-width:2px
     style DB fill:#336791,stroke:#333,stroke-width:2px
