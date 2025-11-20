@@ -96,14 +96,14 @@ graph TD
 1.  docker-compose.yml을 다운합니다다
 2.  환경 변수(.env)를 설정합니다. (backend/.env 예시)
     ```env
-    DB_USER=postgres
-    DB_PASS=password
-    DB_HOST=db
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=password
+    POSTGRES_DB=db
     JWT_SECRET=your_secret_key
     ```
 3.  Docker Compose로 서비스를 실행합니다.
     ```bash
-    docker-compose up --build -d
+    docker-compose up -d
     ```
 4.  브라우저에서 접속합니다.
       - `http://localhost`
