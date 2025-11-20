@@ -3,8 +3,6 @@
 
 # TIM8 - 실시간 원격 협업 대시보드 (Real-time Collaboration Dashboard)
 
-![Project Status](https://img.shields.io/badge/Status-Completed-success)
-![License](https://img.shields.io/badge/License-MIT-blue)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)
 
 > **"팀 프로젝트를 위한 올인원 솔루션: 일정 관리, 실시간 채팅, 그리고 팀원 현황을 한눈에."**
