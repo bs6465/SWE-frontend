@@ -113,10 +113,21 @@ function StatusModal({
     }
   };
 
-  // 초대 링크 복사 핸들러 (HTTP용)
+  // 초대 링크 복사 핸들러 (HTTP/HTTPS 모두 지원)
   const handleCopyInviteLink = () => {
     // 현재 브라우저 주소 기반으로 링크 생성
     const inviteUrl = `${window.location.origin}/invite/${currentUser.team_id}`; // teamOwnerId 대신 내 team_id 사용
+
+    // 1. 최신 방식 (HTTPS / Localhost) 시도
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        alert('초대 링크가 클립보드에 복사되었습니다!');
+        return;
+      } catch (err) {
+        console.error('최신 복사 방식 실패, 구버전 시도...', err);
+      }
+    }
 
     // 2. 구형 방식 (HTTP) 예비책 (Fallback)
     // 화면에 안 보이는 textarea를 만들어서 복사 명령을 실행합니다.
