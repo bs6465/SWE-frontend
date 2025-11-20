@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function TimezoneModal({ isOpen, onClose, teamMembers, currentUser }) {
+function TimezoneModal({ isOpen, onClose, teamMembers, currentUser, onUpdateTimezone }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isEditing, setIsEditing] = useState(false); // 수정 모드 State
 
@@ -96,7 +96,51 @@ function TimezoneModal({ isOpen, onClose, teamMembers, currentUser }) {
 
         <p className="text-gray-600 mb-4">팀원들의 현재 현지 시간입니다.</p>
 
-        {/* ... (팀원 목록 리스트 - 기존 코드 동일) ... */}
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {teamMembers?.map((member) => {
+            const tz = member.timezone || 'Asia/Seoul';
+            // 해당 타임존의 시간 문자열 구하기
+            const localTime = currentTime.toLocaleTimeString('ko-KR', {
+              timeZone: tz,
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: true,
+            });
+            const localDate = currentTime.toLocaleDateString('ko-KR', {
+              timeZone: tz,
+              month: 'short',
+              day: 'numeric',
+            });
+
+            const isMe = member.user_id === currentUser?.user_id;
+
+            return (
+              <div
+                key={member.user_id}
+                className={`flex justify-between items-center p-3 rounded-lg ${
+                  isMe ? 'bg-indigo-50 border border-indigo-200' : 'bg-gray-50'
+                }`}
+              >
+                <div>
+                  <div className="font-semibold text-gray-800 flex items-center">
+                    {member.username}
+                    {isMe && (
+                      <span className="ml-2 text-xs bg-indigo-200 text-indigo-700 px-1.5 py-0.5 rounded">
+                        나
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">{tz}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-mono font-bold text-gray-700">{localTime}</div>
+                  <div className="text-xs text-gray-500">{localDate}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         <button
           onClick={onClose}

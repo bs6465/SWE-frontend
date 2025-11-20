@@ -1,155 +1,187 @@
-// src/components/Calendar.jsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 
-// 헬퍼 함수: 날짜를 'YYYY-MM-DD' 형식으로 변환
-const toYYYYMMDD = (date) => date.toISOString().split('T')[0];
+// 1. [신규] 색상 변환 헬퍼 함수 (Hex -> RGBA)
+// alpha 값(0.0 ~ 1.0)을 조절해 연한 배경색을 만듭니다.
+const getLightColor = (hex, alpha = 0.2) => {
+  if (!hex) return `rgba(99, 102, 241, ${alpha})`; // 기본값 (Indigo)
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+// 날짜 비교 헬퍼
+const isSameDate = (d1, d2) =>
+  d1.getFullYear() === d2.getFullYear() &&
+  d1.getMonth() === d2.getMonth() &&
+  d1.getDate() === d2.getDate();
+
+const toYYYYMMDD = (d) => d.toISOString().split('T')[0];
 
 function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
-  // 1. [State] 현재 사용자가 보고 있는 월 (기본값: 오늘)
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  // 2. [State] API로 불러온 이번 달 일정 목록
   const [schedules, setSchedules] = useState([]);
-
   const token = localStorage.getItem('token');
 
-  // 3. [API Fetch Effect]
-  // 'currentDate' (보고 있는 월)가 바뀔 때마다 실행
+  // ... (useEffect 데이터 로드 및 소켓 로직은 기존과 동일) ...
   useEffect(() => {
-    if (!token || !currentUser?.team_id) return; // 팀 ID가 없으면 중단
-
-    // 현재 연도와 월 (1-12)
+    if (!token || !currentUser?.team_id) return;
     const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1; // getMonth()는 0-11 반환
-
-    // 백엔드 API 호출 ('getSchedulesByMonth')
+    const month = currentDate.getMonth() + 1;
     const fetchSchedules = async () => {
       try {
-        const response = await fetch(`/api/schedules/month?year=${year}&month=${month}`, {
+        const res = await fetch(`/api/schedules/month?year=${year}&month=${month}`, {
           headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store', // 캐시 방지
+          cache: 'no-store',
         });
-        if (!response.ok) throw new Error('일정 로드 실패');
-
-        const data = await response.json();
-        setSchedules(data); // 불러온 일정을 State에 저장
+        if (res.ok) setSchedules(await res.json());
       } catch (err) {
-        console.error('캘린더 일정 로드 오류:', err);
+        console.error(err);
       }
     };
-
     fetchSchedules();
-  }, [currentDate, currentUser, token]); // 월이 바뀌거나 유저가 확정될 때
+  }, [currentDate, currentUser, token]);
 
-  // 4. [Socket.io Effect]
-  // 컴포넌트가 마운트될 때 딱 한 번 실행
   useEffect(() => {
     if (!socket) return;
-
-    const handleScheduleAdded = (data) => {
-      console.log('소켓: 일정 추가됨', data.schedule);
-      // TODO: 이번 달에 해당하는 일정인지 확인하는 로직 (선택 사항)
-      setSchedules((prevSchedules) => [...prevSchedules, data.schedule]);
-    };
-
-    // 이벤트 리스너: 다른 유저가 일정 삭제
-    // 'schedule.controller.js'의 'deleteSchedule'
-    const handleScheduleRemoved = (data) => {
-      console.log('소켓: 일정 삭제됨', data.scheduleId);
-      setSchedules((prevSchedules) =>
-        prevSchedules.filter((s) => s.schedule_id !== data.scheduleId),
-      );
-    };
-
-    // 'task.controller.js'의 이벤트들도 여기에서 처리
-    //
-    const handleTaskChange = (data) => {
-      console.log('소켓: 태스크 변경', data);
-      // (캘린더 새로고침 또는 특정 일정만 업데이트)
-      // 지금은 간단히 console.log만
-    };
-
-    // 소켓 리스너 등록
-    socket.on('scheduleAdded', handleScheduleAdded);
-    socket.on('scheduleRemoved', handleScheduleRemoved);
-    socket.on('createTask', handleTaskChange);
-    socket.on('isTaskCompletedChanged', handleTaskChange);
-    socket.on('deleteTask', handleTaskChange);
-
-    // 컴포넌트 언마운트 시 리스너 정리
+    const refresh = () => setCurrentDate((d) => new Date(d));
+    socket.on('scheduleAdded', refresh);
+    socket.on('scheduleUpdated', refresh);
+    socket.on('scheduleRemoved', refresh);
+    socket.on('createTask', refresh);
+    socket.on('isTaskCompletedChanged', refresh);
+    socket.on('deleteTask', refresh);
     return () => {
-      socket.off('scheduleAdded', handleScheduleAdded);
-      socket.off('scheduleRemoved', handleScheduleRemoved);
-      socket.off('createTask', handleTaskChange);
-      socket.off('isTaskCompletedChanged', handleTaskChange);
-      socket.off('deleteTask', handleTaskChange);
+      socket.off('scheduleAdded');
+      socket.off('scheduleUpdated');
+      socket.off('scheduleRemoved');
+      socket.off('createTask');
+      socket.off('isTaskCompletedChanged');
+      socket.off('deleteTask');
     };
-  }, [socket]); // socket 객체가 확정될 때
+  }, [socket]);
 
-  // 5. [렌더링 로직] 현재 월의 날짜 배열 생성 (useMemo로 캐싱)
-  const calendarGrid = useMemo(() => {
+  // 달력 그리드 생성 (테트리스 알고리즘 포함)
+  const calendarWeeks = useMemo(() => {
     const year = currentDate.getFullYear();
-    const month = currentDate.getMonth(); // 0-11
+    const month = currentDate.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDayOfMonth);
+    startDate.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay());
+    const endDate = new Date(lastDayOfMonth);
+    endDate.setDate(lastDayOfMonth.getDate() + (6 - lastDayOfMonth.getDay()));
 
-    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0(일) - 6(토)
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); // 30, 31 등
+    const weeks = [];
+    let currentWeek = [];
+    let dayIter = new Date(startDate);
 
-    const days = [];
-
-    // 1일차가 시작하기 전의 빈 칸들
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push({ key: `empty-${i}`, date: null, events: [] });
-    }
-
-    // 실제 날짜 칸들
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = toYYYYMMDD(new Date(year, month, day));
-
-      // 해당 날짜(dateStr)에 포함되는 일정들을 필터링
-      const dayEvents = schedules.filter((schedule) => {
-        const startDate = toYYYYMMDD(new Date(schedule.start_time));
-        // const endDate = toYYYYMMDD(new Date(schedule.end_time));
-        return dateStr === startDate;
+    while (dayIter <= endDate) {
+      currentWeek.push({
+        date: new Date(dayIter),
+        isCurrentMonth: dayIter.getMonth() === month,
       });
-
-      days.push({ key: `day-${day}`, date: day, events: dayEvents });
+      if (currentWeek.length === 7) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+      dayIter.setDate(dayIter.getDate() + 1);
     }
+    return weeks;
+  }, [currentDate]);
 
-    return days;
-  }, [currentDate, schedules]); // 월이 바뀌거나 일정이 바뀌면 재계산
+  // 주별 일정 배치 (Tetris Logic)
+  const processWeekEvents = (week) => {
+    const weekStart = week[0].date;
+    const weekEnd = week[6].date;
+    weekStart.setHours(0, 0, 0, 0);
+    weekEnd.setHours(23, 59, 59, 999);
 
-  // 6. [핸들러] 월 변경
-  const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-  const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    const weekEvents = schedules.filter((sch) => {
+      const s = new Date(sch.start_time);
+      const e = new Date(sch.end_time);
+      s.setHours(0, 0, 0, 0);
+      e.setHours(23, 59, 59, 999);
+      return s <= weekEnd && e >= weekStart;
+    });
+
+    weekEvents.sort((a, b) => {
+      const startA = new Date(a.start_time).getTime();
+      const startB = new Date(b.start_time).getTime();
+      if (startA !== startB) return startA - startB;
+      const durA = new Date(a.end_time) - new Date(a.start_time);
+      const durB = new Date(b.end_time) - new Date(b.start_time);
+      return durB - durA;
+    });
+
+    const slots = [];
+    const processedEvents = weekEvents.map((sch) => {
+      const s = new Date(sch.start_time);
+      const e = new Date(sch.end_time);
+      s.setHours(0, 0, 0, 0);
+      e.setHours(0, 0, 0, 0);
+
+      let startIdx = Math.floor((s - weekStart) / (1000 * 60 * 60 * 24));
+      let endIdx = Math.floor((e - weekStart) / (1000 * 60 * 60 * 24));
+
+      const isContinuesLeft = startIdx < 0;
+      const isContinuesRight = endIdx > 6;
+      if (startIdx < 0) startIdx = 0;
+      if (endIdx > 6) endIdx = 6;
+
+      let assignedSlot = -1;
+      for (let i = 0; i < slots.length; i++) {
+        if (slots[i] < startIdx) {
+          assignedSlot = i;
+          slots[i] = endIdx;
+          break;
+        }
+      }
+      if (assignedSlot === -1) {
+        assignedSlot = slots.length;
+        slots.push(endIdx);
+      }
+
+      return {
+        ...sch,
+        layout: {
+          startIdx,
+          endIdx,
+          span: endIdx - startIdx + 1,
+          isContinuesLeft,
+          isContinuesRight,
+          slotIndex: assignedSlot,
+        },
+      };
+    });
+    return { events: processedEvents, totalSlots: slots.length };
   };
 
   return (
-    <section className="mb-8">
-      {/* 월 이동 헤더 */}
+    <section className="mb-8 select-none">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-800">
-          {`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`}
+        <h2 className="text-2xl font-bold text-gray-800">
+          {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
         </h2>
         <div className="space-x-2">
-          {/* 2. '+ 일정 추가' 버튼 */}
           <button
-            onClick={onAddScheduleClick} // App.jsx가 넘겨준 함수 호출
-            className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-semibold"
+            onClick={onAddScheduleClick}
+            className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-semibold shadow-sm"
           >
             + 일정 추가
           </button>
           <button
-            onClick={goToPreviousMonth}
+            onClick={() =>
+              setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))
+            }
             className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
           >
             &lt; 이전
           </button>
           <button
-            onClick={goToNextMonth}
+            onClick={() =>
+              setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))
+            }
             className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
           >
             다음 &gt;
@@ -157,43 +189,153 @@ function Calendar({ currentUser, socket, onEventClick, onAddScheduleClick }) {
         </div>
       </div>
 
-      {/* 캘린더 그리드 */}
       <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-        {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 border-b">
-          {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
-            <div key={day} className="text-center font-semibold text-gray-600 p-3 text-sm">
-              {day}
+        <div className="grid grid-cols-7 border-b bg-gray-50">
+          {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
+            <div key={d} className="py-2 text-center text-sm font-bold text-gray-500">
+              {d}
             </div>
           ))}
         </div>
 
-        {/* 날짜 그리드 */}
-        <div className="grid grid-cols-7">
-          {calendarGrid.map((dayInfo) => (
-            <div
-              key={dayInfo.key}
-              className={`calendar-cell relative ${!dayInfo.date ? 'bg-gray-50' : ''}`}
-            >
-              <span className="day-number text-gray-700">{dayInfo.date}</span>
+        <div className="flex flex-col">
+          {calendarWeeks.map((week, wIndex) => {
+            const { events, totalSlots } = processWeekEvents(week);
+            const rowHeight = Math.max(100, totalSlots * 26 + 35);
 
-              {/* 이벤트 렌더링 */}
-              <div className="mt-1 space-y-1">
-                {dayInfo.events.map((event) => (
+            return (
+              <div
+                key={wIndex}
+                className="grid grid-cols-7 border-b relative"
+                style={{ height: `${rowHeight}px` }}
+              >
+                {/* 배경 그리드 */}
+                {week.map((dayInfo, dIndex) => (
                   <div
-                    key={event.schedule_id}
-                    // 'onEventClick'은 App.jsx에서 ProjectModal을 엽니다.
-                    onClick={() => onEventClick(event)}
-                    className="event-container p-1 rounded-md text-white text-xs truncate"
-                    // 'schedule.controller.js'의 'color' 필드 사용
-                    style={{ backgroundColor: event.color || '#6366f1' }} // 기본색(indigo)
+                    key={dIndex}
+                    className={`border-r p-1 h-full ${
+                      dayInfo.isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'
+                    }`}
                   >
-                    {event.title}
+                    <span
+                      className={`text-sm font-medium block w-7 h-7 leading-7 text-center ${
+                        isSameDate(dayInfo.date, new Date())
+                          ? 'bg-indigo-600 text-white rounded-full'
+                          : dayInfo.isCurrentMonth
+                          ? 'text-gray-700'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      {dayInfo.date.getDate()}
+                    </span>
                   </div>
                 ))}
+
+                {/* 이벤트 바 */}
+                <div className="absolute top-8 left-0 w-full px-0">
+                  {events.map((sch) => {
+                    const totalDuration = new Date(sch.end_time) - new Date(sch.start_time);
+                    const percentRatio =
+                      sch.total_tasks > 0 ? sch.completed_tasks / sch.total_tasks : 0;
+
+                    // 👇 [수정] 100%일 때 시간 계산 무시하고 강제로 100으로 설정
+                    let fillPercent = 0;
+
+
+                    if (percentRatio === 1) {
+                      fillPercent = 100; // 👈 100%면 무조건 꽉 채움 (시간 차이 무시)
+                    } else {
+                      // 100%가 아닐 때만 기존 시간 기반 계산 수행
+                      const progressEndTime = new Date(
+                        new Date(sch.start_time).getTime() + totalDuration * percentRatio,
+                      );
+
+                      const weekStart = new Date(week[sch.layout.startIdx].date);
+                      weekStart.setHours(0, 0, 0, 0);
+                      const weekEnd = new Date(week[sch.layout.endIdx].date);
+                      weekEnd.setHours(23, 59, 59, 999);
+
+                      if (progressEndTime < weekStart) fillPercent = 0;
+                      else if (progressEndTime > weekEnd) fillPercent = 100;
+                      else
+                        fillPercent = ((progressEndTime - weekStart) / (weekEnd - weekStart)) * 100;
+                    }
+
+                    const displayPercent = Math.round(percentRatio * 100);
+                    const { layout } = sch;
+
+                    // 2. [핵심] 해당 일정 색상의 연한 버전(배경용) 계산 (투명도 0.2)
+                    const lightBgColor = getLightColor(sch.color, 0.2);
+
+                    return (
+                      <div
+                        key={sch.schedule_id}
+                        className={`
+                          absolute h-[22px] text-xs cursor-pointer flex items-center shadow-sm hover:brightness-95 transition-all border border-white/20 box-border
+                          ${
+                            layout.isContinuesLeft
+                              ? 'rounded-l-none border-l-0'
+                              : 'rounded-l-md ml-1'
+                          } 
+                          ${
+                            layout.isContinuesRight
+                              ? 'rounded-r-none border-r-0'
+                              : 'rounded-r-md mr-1'
+                          }
+                        `}
+                        style={{
+                          left: `${(layout.startIdx / 7) * 100}%`,
+                          width: `calc(${(layout.span / 7) * 100}% - ${
+                            layout.isContinuesLeft ? 0 : 4
+                          }px - ${layout.isContinuesRight ? 0 : 4}px)`,
+
+                          // 3. [핵심] 회색 대신 '연한 일정 색상'을 배경으로 사용
+                          backgroundColor: lightBgColor,
+
+                          top: `${layout.slotIndex * 26}px`,
+                          zIndex: 10,
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(sch);
+                        }}
+                      >
+                        {/* 진행률 게이지 (진한 원본 색상) */}
+                        <div
+                          className={`absolute top-0 left-0 h-full transition-all duration-500 ${
+                            layout.isContinuesLeft ? 'rounded-l-none' : 'rounded-l-md'
+                          } ${layout.isContinuesRight || fillPercent < 100 ? '' : 'rounded-r-md'}`}
+                          style={{
+                            width: `${fillPercent}%`,
+                            backgroundColor: sch.color || '#6366f1',
+                          }}
+                        />
+
+                        {/* 텍스트: 진행바가 덮으면(>40%) 흰색, 아니면 짙은 색 */}
+                        <span
+                          className="relative z-10 px-2 truncate font-semibold"
+                          style={{
+                            // 짙은 색 텍스트도 '검정' 대신 '일정 색의 아주 짙은 버전'이나 '짙은 회색' 사용
+                            color: fillPercent > 40 ? 'white' : '#1f2937',
+                            textShadow: fillPercent > 40 ? '0px 0px 2px rgba(0,0,0,0.3)' : 'none',
+                          }}
+                        >
+                          {(!layout.isContinuesLeft || new Date(sch.start_time).getDay() === 0) && (
+                            <>
+                              {sch.title}{' '}
+                              <span className="opacity-90 text-[10px] font-normal ml-1">
+                                {sch.total_tasks > 0 ? `${displayPercent}%` : ''}
+                              </span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

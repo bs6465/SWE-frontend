@@ -1,6 +1,6 @@
 // src/components/StatusModal.jsx
 import React, { useMemo, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCrown } from 'react-icons/fa';
 
 //  props 받기
 function StatusModal({
@@ -159,6 +159,47 @@ function StatusModal({
     }
   };
 
+  // 팀장 권한 위임 핸들러
+  const handleChangeOwner = async (targetUserId, targetUsername) => {
+    if (
+      !window.confirm(
+        `정말로 ${targetUsername}님에게 팀장 권한을 넘기시겠습니까?\n(권한을 넘기면 당신은 일반 팀원이 됩니다.)`,
+      )
+    )
+      return;
+
+    const token = localStorage.getItem('token');
+    setIsLoading(true);
+
+    try {
+      // POST /api/team/change
+      const response = await fetch('/api/team/change', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: targetUserId }), // 백엔드가 받는 키값 확인 (userId)
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || '권한 위임 실패');
+      }
+
+      alert(`팀장 권한이 ${targetUsername}님에게 위임되었습니다.`);
+
+      // 성공 시 모달을 닫아서, App.jsx가 데이터를 새로고침하게 유도하거나
+      // 페이지를 새로고침(navigate(0)) 할 수도 있습니다.
+      onClose();
+      window.location.reload(); // 가장 확실한 갱신 방법 (권한이 바뀌었으므로)
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -204,15 +245,29 @@ function StatusModal({
                       </span>
                     </div>
 
-                    {/* 강퇴 버튼: 나는 팀장이고 + 상대방은 내가 아닐 때 */}
+                    {/* 나는 팀장이고 + 상대방은 내가 아닐 때 */}
                     {isMeOwner && !isTargetMe && (
-                      <button
-                        onClick={() => handleKickMember(member.user_id, member.username)}
-                        className="text-red-400 hover:text-red-600 p-1"
-                        title="팀에서 내보내기"
-                      >
-                        <FaTimes />
-                      </button>
+                      <>
+                        {/* [신규] 위임 버튼 (왕관 아이콘) */}
+                        <button
+                          onClick={() => handleChangeOwner(member.user_id, member.username)}
+                          className="text-yellow-400 hover:text-yellow-600 p-1"
+                          title="팀장 권한 위임"
+                          disabled={isLoading}
+                        >
+                          <FaCrown />
+                        </button>
+
+                        {/* 강퇴 버튼 (기존) */}
+                        <button
+                          onClick={() => handleKickMember(member.user_id, member.username)}
+                          className="text-red-400 hover:text-red-600 p-1"
+                          title="팀에서 내보내기"
+                          disabled={isLoading}
+                        >
+                          <FaTimes />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
