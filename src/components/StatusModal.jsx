@@ -114,7 +114,7 @@ function StatusModal({
   };
 
   // 초대 링크 복사 핸들러 (HTTP/HTTPS 모두 지원)
-  const handleCopyInviteLink = () => {
+  const handleCopyInviteLink = async () => {
     // 현재 브라우저 주소 기반으로 링크 생성
     const inviteUrl = `${window.location.origin}/invite/${currentUser.team_id}`; // teamOwnerId 대신 내 team_id 사용
 
