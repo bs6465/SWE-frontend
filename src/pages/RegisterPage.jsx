@@ -15,11 +15,23 @@ function RegisterPage() {
     setSuccess(null);
 
     try {
+      // 1. [핵심] 브라우저의 타임존 자동 감지
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // 예: "Asia/Seoul"
+
+      // 2. 오프셋 계산 (분 단위)
+      // JS의 getTimezoneOffset()은 UTC보다 빠르면 음수(KST = -540)를 반환하므로 부호를 반대로 뒤집어줍니다.
+      const detectedOffset = new Date().getTimezoneOffset() * -1; // 예: 540
+
       // 백엔드 auth.controller.js의 'register' 함수 호출
       const response = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          username,
+          password,
+          timezone: detectedTimezone, // 자동 감지된 값 전송
+          timezoneOffset: detectedOffset,
+        }),
       });
       const data = await response.json();
 

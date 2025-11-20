@@ -9,6 +9,7 @@ import Calendar from './components/Calendar'; // Calendar import
 import ProjectModal from './components/ProjectModal'; // ProjectModal import
 import CreateScheduleModal from './components/CreateScheduleModal';
 import AddMemberModal from './components/AddMemberModal';
+import TimezoneModal from './components/TimezoneModal';
 import Header from './components/Header';
 import { useNavigate } from 'react-router-dom'; // 401 에러 시 로그아웃 처리용
 
@@ -33,6 +34,7 @@ function App() {
     project: null, // (ProjectModal용)
     createSchedule: false, // '일정 생성' 모달 상태
     addMember: false,
+    timezone: false,
   });
 
   const navigate = useNavigate();
@@ -152,6 +154,20 @@ function App() {
     };
   }, [navigate]); // navigate 함수가 변경될 때도 (거의 없음) 다시 실행
 
+  // 유저 정보 업데이트 핸들러 (TimezoneModal에서 사용)
+  const handleUpdateUser = (updatedUser) => {
+    // 기존 currentUser 정보를 새 정보로 덮어쓰기 (team_id 등 유지하면서 timezone만 갱신)
+    setCurrentUser((prev) => ({ ...prev, ...updatedUser }));
+
+    // (선택) teamMembers 목록에서도 내 정보를 찾아서 업데이트해줘야
+    // 리스트 뷰에서도 즉시 반영됩니다.
+    setTeamMembers((prev) =>
+      prev.map((m) =>
+        m.user_id === updatedUser.user_id ? { ...m, timezone: updatedUser.timezone } : m,
+      ),
+    );
+  };
+
   // --- StatusModal 핸들러 ---
   const handleOpenStatusModal = () => {
     setModalState((prev) => ({ ...prev, status: true }));
@@ -164,7 +180,7 @@ function App() {
 
   // --- TimezoneModal 핸들러 ---
   const handleOpenTimezoneModal = () => {
-    alert('Timezone 모달은 아직 만들지 않았습니다.');
+    setModalState((prev) => ({ ...prev, timezone: true }));
   };
 
   // --- ProjectModal 핸들러 ---
@@ -189,6 +205,7 @@ function App() {
       project: null,
       createSchedule: false,
       addMember: false,
+      timezone: false,
     }));
   };
 
@@ -199,9 +216,10 @@ function App() {
 
       <StatusCards
         onStatusClick={handleOpenStatusModal}
-        onTimezoneClick={() => alert('Timezone 모달 미구현')}
+        onTimezoneClick={handleOpenTimezoneModal}
         onlineCount={onlineUsers.size} // .length에서 .size로 수정
         totalCount={teamMembers?.length || 0}
+        teamMembers={teamMembers}
       />
 
       <Calendar
@@ -238,6 +256,14 @@ function App() {
         isOpen={!!modalState.project} // project 데이터가 있으면 true
         onClose={handleCloseModal}
         project={modalState.project} // project 데이터 전달
+      />
+
+      <TimezoneModal
+        isOpen={modalState.timezone}
+        onClose={handleCloseModal}
+        teamMembers={teamMembers}
+        currentUser={currentUser}
+        onUpdateTimezone={handleUpdateUser}
       />
 
       {/* 6. 일정 생성 모달 렌더링 */}
