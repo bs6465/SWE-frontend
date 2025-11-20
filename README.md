@@ -9,10 +9,7 @@
 > 
 > 1인 개발(Full Stack & DevOps)로 설계부터 배포 환경 구성까지 전 과정을 주도하여 개발했습니다.
 
-## 📸 프로젝트 미리보기
-| 메인 캘린더 (테트리스 뷰) | 팀원 현황 & 채팅 |
-| :---: | :---: |
-| ![Calendar View](./images/calendar_view.png) | ![Chat & Status](./images/chat_view.png) |
+
 ## 🏗️ 아키텍처 (Architecture)
 
 Nginx를 리버스 프록시로 활용하여 프론트엔드와 백엔드, Socket.io 통신을 단일 진입점(Port 80)으로 통합 관리하는 **Docker Compose 기반의 컨테이너 환경**을 구축했습니다.
