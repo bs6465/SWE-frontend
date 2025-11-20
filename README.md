@@ -1,3 +1,5 @@
+백엔드 : [](https://github.com/bs6465/SWEtim)
+
 
 # TIM8 - 실시간 원격 협업 대시보드 (Real-time Collaboration Dashboard)
 
@@ -93,8 +95,8 @@ graph TD
 
 ### Installation
 
-1.  docker-compose.yml을 다운합니다다
-2.  환경 변수(.env)를 설정합니다. (backend/.env 예시)
+1.  docker-compose.yml을 다운합니다
+2.  환경 변수(.env)를 작성합니다. (.env 예시)
     ```env
     POSTGRES_USER=postgres
     POSTGRES_PASSWORD=password
