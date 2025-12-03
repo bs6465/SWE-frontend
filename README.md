@@ -57,9 +57,15 @@ graph TD
 
 ### DevOps & Infrastructure
 
+<<<<<<< HEAD
 - **Containerization:** Docker, Docker Compose
 - **Proxy Server:** Nginx (Reverse Proxy configuration)
 - **Deployment:** Home Server (Linux environment)
+=======
+  - **Containerization:** Docker, Docker Compose
+  - **Proxy Server:** Nginx (Reverse Proxy configuration)
+  - **Deployment:** Ubuntu 24.04
+>>>>>>> f44aa72aa46c52f2e53a9c16c14999422d6cbf5a
 
 ## ✨ 주요 기능 (Key Features)
 
