@@ -60,9 +60,9 @@ graph TD
 - **Containerization:** Docker, Docker Compose
 - **Proxy Server:** Nginx (Reverse Proxy configuration)
 - **Deployment:** Home Server (Linux environment)
-- **Containerization:** Docker, Docker Compose
-- **Proxy Server:** Nginx (Reverse Proxy configuration)
-- **Deployment:** Ubuntu 24.04
+  - **Containerization:** Docker, Docker Compose
+  - **Proxy Server:** Nginx (Reverse Proxy configuration)
+  - **Deployment:** Ubuntu 24.04
 
 ## ✨ 주요 기능 (Key Features)
 
